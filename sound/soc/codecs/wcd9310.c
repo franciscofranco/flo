@@ -41,6 +41,7 @@
 struct sound_control {
 	unsigned int default_headset_val;
 	unsigned int default_headphones_val;
+	unsigned int default_speaker_val;
 	struct snd_soc_codec *sound_control_codec;
 	bool lock;
 } soundcontrol = {
@@ -8506,6 +8507,24 @@ void update_headset_volume_boost(int vol_boost)
 			tabla_read(soundcontrol.sound_control_codec, 
 						TABLA_A_RX_HPH_R_GAIN));
 }
+
+void update_speaker_volume_boost(int vol_boost)
+{
+	unsigned int default_val = soundcontrol.default_speaker_val;
+	unsigned int boosted_val = vol_boost != 0 ? 
+									default_val + vol_boost : default_val;
+
+	pr_info("Sound Control: Speaker default value %d\n", default_val);
+	
+	soundcontrol.lock = false;
+	tabla_write(soundcontrol.sound_control_codec, 
+				TABLA_A_CDC_RX3_VOL_CTL_B2_CTL, boosted_val);
+	soundcontrol.lock = true;
+	
+	pr_info("Sound Control: Boosted Speaker value %d\n", 
+			tabla_read(soundcontrol.sound_control_codec, 
+						TABLA_A_CDC_RX3_VOL_CTL_B2_CTL));
+}
 #endif
 
 
@@ -8752,6 +8771,8 @@ static int tabla_codec_probe(struct snd_soc_codec *codec)
 	soundcontrol.default_headset_val = tabla_read(codec, TABLA_A_RX_HPH_L_GAIN);
 	soundcontrol.default_headphones_val = tabla_read(codec, 
 												TABLA_A_CDC_RX1_VOL_CTL_B2_CTL);
+	soundcontrol.default_speaker_val = tabla_read(codec,
+												TABLA_A_CDC_RX3_VOL_CTL_B2_CTL);
 
 	return ret;
 

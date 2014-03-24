@@ -10,11 +10,11 @@
 #include <linux/device.h>
 #include <linux/miscdevice.h>
 
-#define SOUNDCONTROL_VERSION 3
+#define SOUNDCONTROL_VERSION 4
 
-extern void update_headphones_volume_boost(unsigned int vol_boost);
-
-extern void update_headset_volume_boost(int gain_boost);
+extern void update_headphones_volume_boost(unsigned int new_val);
+extern void update_headset_volume_boost(int new_val);
+extern void update_speaker_volume_boost(int new_val);
 
 /*
  * Volume boost value
@@ -24,8 +24,12 @@ int boost_limit = 20;
 int boost_limit_min = -20;
 
 int headset_boost = 0;
-int headset_boost_limit = 30;
-int headset_boost_limit_min = -30;
+int headset_boost_limit = 20;
+int headset_boost_limit_min = -20;
+
+int speaker_boost = 0;
+int speaker_boost_limit = 20;
+int speaker_boost_limit_min = -20;
 
 /*
  * Sysfs get/set entries
@@ -85,21 +89,49 @@ static ssize_t headset_boost_store(struct device * dev, struct device_attribute 
     return size;
 }
 
+static ssize_t speaker_boost_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+    return sprintf(buf, "%d\n", speaker_boost);
+}
+
+static ssize_t speaker_boost_store(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
+{
+    int new_val;
+
+	sscanf(buf, "%d", &new_val);
+
+	if (new_val != speaker_boost) {
+		if (new_val > speaker_boost_limit)
+			new_val = speaker_boost_limit;
+		if (new_val < speaker_boost_limit_min)
+			new_val = speaker_boost_limit_min;
+
+		pr_info("New Speaker boost: %d\n", new_val);
+
+		speaker_boost = new_val;
+		update_speaker_volume_boost(speaker_boost);
+	}
+
+    return size;
+}
+
 static ssize_t soundcontrol_version(struct device * dev, struct device_attribute * attr, char * buf)
 {
     return sprintf(buf, "%d\n", SOUNDCONTROL_VERSION);
 }
 
-static DEVICE_ATTR(volume_boost, 0777, volume_boost_show, volume_boost_store);
-static DEVICE_ATTR(headset_boost, 0777, headset_boost_show, headset_boost_store);
+static DEVICE_ATTR(volume_boost, 0664, volume_boost_show, volume_boost_store);
+static DEVICE_ATTR(headset_boost, 0664, headset_boost_show, headset_boost_store);
+static DEVICE_ATTR(speaker_boost, 0664, speaker_boost_show, speaker_boost_store);
 
-static DEVICE_ATTR(version, 0777 , soundcontrol_version, NULL);
+static DEVICE_ATTR(version, 0664 , soundcontrol_version, NULL);
 
 static struct attribute *soundcontrol_attributes[] = 
 {
 	&dev_attr_volume_boost.attr,
 	&dev_attr_headset_boost.attr,
 	&dev_attr_version.attr,
+	&dev_attr_speaker_boost.attr,
 	NULL
 };
 
