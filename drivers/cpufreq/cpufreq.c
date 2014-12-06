@@ -688,8 +688,8 @@ static ssize_t show_UV_mV_table(struct cpufreq_policy *policy, char *buf) {
 	return acpuclk_get_vdd_levels_str(buf);
 }
 
-static ssize_t store_UV_mV_table(struct cpufreq_policy *policy, const char *buf, 
-									size_t count) {
+static ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
+		const char *buf, size_t count) {
 	acpuclk_set_vdd(buf);
 	return count;
 }
@@ -725,7 +725,7 @@ static struct attribute *default_attrs[] = {
 	&scaling_driver.attr,
 	&scaling_available_governors.attr,
 	&scaling_setspeed.attr,
-    &dvfs_test.attr,
+	&dvfs_test.attr,
 	&UV_mV_table.attr,
 	NULL
 };
