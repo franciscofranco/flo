@@ -1605,6 +1605,8 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 {
 	unsigned long flags;
 	int cpu, src_cpu, success = 0;
+	int notify = 0;
+	struct migration_notify_data mnd;
 
 	smp_wmb();
 	raw_spin_lock_irqsave(&p->pi_lock, flags);
@@ -1662,14 +1664,33 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 	ttwu_queue(p, cpu);
 stat:
 	ttwu_stat(p, cpu, wake_flags);
+
+#ifndef CONFIG_UML
+	if (task_notify_on_migrate(p)) {
+		mnd.src_cpu = src_cpu;
+                mnd.dest_cpu = cpu;
+                mnd.load = pct_task_load(p);
+
+                /*
+                 * Call the migration notifier with mnd for foreground task
+                 * migrations as well as for wakeups if their load is above
+                 * sysctl_sched_wakeup_load_threshold. This would prompt the
+                 * cpu-boost to boost the CPU frequency on wake up of a heavy
+                 * weight foreground task
+                 */
+                if ((src_cpu != cpu) || (mnd.load >
+                                        sysctl_sched_wakeup_load_threshold))
+			notify = 1;
+	}
+#endif
+
 out:
 	raw_spin_unlock_irqrestore(&p->pi_lock, flags);
 
-#ifndef CONFIG_UML
-	if (src_cpu != cpu && task_notify_on_migrate(p))
+	if (notify)
 		atomic_notifier_call_chain(&migration_notifier_head,
-					   cpu, (void *)src_cpu);
-#endif
+                                           0, (void *)&mnd);
+
 	return success;
 }
 
