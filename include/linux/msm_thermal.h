@@ -22,18 +22,4 @@ struct msm_thermal_data {
 	uint32_t freq_step;
 };
 
-#ifdef CONFIG_THERMAL_MONITOR
-extern int msm_thermal_init(struct msm_thermal_data *pdata);
-extern int msm_thermal_device_init(void);
-#else
-static inline int msm_thermal_init(struct msm_thermal_data *pdata)
-{
-	return -ENOSYS;
-}
-static inline int msm_thermal_device_init(void)
-{
-	return -ENOSYS;
-}
-#endif
-
 #endif /*__MSM_THERMAL_H*/
