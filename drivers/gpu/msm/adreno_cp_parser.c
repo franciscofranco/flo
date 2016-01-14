@@ -174,6 +174,7 @@ static int adreno_ib_add_range(struct kgsl_device *device,
 	ib_obj = adreno_ib_check_overlap(gpuaddr, size, ib_obj_list);
 	if (ib_obj) {
 		adreno_ib_merge_range(ib_obj, gpuaddr, size);
+		kgsl_mem_entry_put(entry);
 	} else {
 		if (MAX_IB_OBJS == ib_obj_list->num_objs) {
 			KGSL_DRV_ERR(device,
