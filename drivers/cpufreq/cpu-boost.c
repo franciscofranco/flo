@@ -144,7 +144,7 @@ static int boost_adjust_notify(struct notifier_block *nb, unsigned long val,
 		return NOTIFY_OK;
 
 	if (!b_min && !ib_min)
-		break;
+		return NOTIFY_OK;
 
 	min = max(b_min, ib_min);
 	min = min(min, policy->max);
