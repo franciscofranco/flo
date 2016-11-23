@@ -395,5 +395,3 @@ endif
 obj-$(CONFIG_MSM_CPU_PWRCTL) +=  msm_cpu_pwrctl.o
 obj-$(CONFIG_HAS_MACH_MEMUTILS) += memutils/
 obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
-
-obj-$(CONFIG_LCD_KCAL_STANDALONE) += msm_kcal_ctrl.o
