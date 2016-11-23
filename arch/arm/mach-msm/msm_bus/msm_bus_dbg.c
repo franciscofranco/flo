@@ -678,6 +678,7 @@ static int __init msm_bus_debugfs_init(void)
 		fablist->file = debugfs_create_file(fablist->name, S_IRUGO,
 			commit, (void *)fablist->name, &fabric_data_fops);
 		if (fablist->file == NULL) {
+			mutex_unlock(&msm_bus_dbg_fablist_lock);
 			MSM_BUS_DBG("Cannot create files for commit data\n");
 			goto err;
 		}
