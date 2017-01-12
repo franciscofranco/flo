@@ -576,8 +576,6 @@ void mdp_set_kcal(struct mdp_pcc_info *pcc_info)
 static DEVICE_ATTR(msm_fb_type, S_IRUGO, msm_fb_msm_fb_type, NULL);
 static DEVICE_ATTR(msm_fb_fps_level, S_IRUGO | S_IWUSR | S_IWGRP, NULL, \
 				msm_fb_fps_level_change);
-static DEVICE_ATTR(rgb, S_IRUGO | S_IWUSR | S_IWGRP, mdp_get_rgb, \
-				mdp_set_rgb);
 static DEVICE_ATTR(cabc, S_IRUGO | S_IWUSR | S_IWGRP, msm_fb_get_cabc, msm_fb_set_cabc);
 static DEVICE_ATTR(sre, S_IRUGO | S_IWUSR | S_IWGRP, msm_fb_get_sre, msm_fb_set_sre);
 static DEVICE_ATTR(aco, S_IRUGO | S_IWUSR | S_IWGRP, msm_fb_get_aco, msm_fb_set_aco);
@@ -585,7 +583,6 @@ static DEVICE_ATTR(aco, S_IRUGO | S_IWUSR | S_IWGRP, msm_fb_get_aco, msm_fb_set_
 static struct attribute *msm_fb_attrs[] = {
 	&dev_attr_msm_fb_type.attr,
 	&dev_attr_msm_fb_fps_level.attr,
-	&dev_attr_rgb.attr,
 	&dev_attr_cabc.attr,
 	&dev_attr_sre.attr,
 	&dev_attr_aco.attr,
